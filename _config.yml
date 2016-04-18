@@ -10,3 +10,4 @@ github_username:  opentokix
 
 # Build settings
 markdown: kramdown
+timezone: Europe/Stockholm
