@@ -1,0 +1,79 @@
+<h2 id="kubernetes-dashboard">Kubernetes dashboard</h2>
+
+<h3 id="kubernetes-dashboard-authorization">Kubernetes Dashboard Authorization</h3>
+
+<p>To access the kubernetes dashboard you login to your controller or use your own client where you have a <em>kubectl</em> working.</p>
+
+<h4 id="kubectl">Kubectl</h4>
+
+<p>Enable proxy, local client: 
+$ kubectl proxy</p>
+
+<p><strong>ssh-tunnel proxy:</strong></p>
+
+<p>ssh -L 8001:localhost:8001 host-with-kubectl
+$ kubectl proxy</p>
+
+<p>What proxy is doing is that it opens up a localhost proxy to various functions in your kubernetesystem via webinterface and you will be authorized to do stuff.</p>
+
+<h4 id="kubernetes-dashboard-1">Kubernetes dashboard</h4>
+
+<p>Since a few versions back you are not allowed to access the dashboard without authorization and there is a few steps needed to get the token.</p>
+
+<p>This will create a ServiceAccount with admin access (This is not recommended for production) name this file: dashboard-admin.yaml</p>
+
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">apiVersion</span><span class="pi">:</span> <span class="s">rbac.authorization.k8s.io/v1beta1</span>
+<span class="na">kind</span><span class="pi">:</span> <span class="s">ClusterRoleBinding</span>
+<span class="na">metadata</span><span class="pi">:</span>
+  <span class="na">name</span><span class="pi">:</span> <span class="s">kubernetes-dashboard</span>
+  <span class="na">labels</span><span class="pi">:</span>
+    <span class="na">k8s-app</span><span class="pi">:</span> <span class="s">kubernetes-dashboard</span>
+<span class="na">roleRef</span><span class="pi">:</span>
+  <span class="na">apiGroup</span><span class="pi">:</span> <span class="s">rbac.authorization.k8s.io</span>
+  <span class="na">kind</span><span class="pi">:</span> <span class="s">ClusterRole</span>
+  <span class="na">name</span><span class="pi">:</span> <span class="s">cluster-admin</span>
+<span class="na">subjects</span><span class="pi">:</span>
+<span class="pi">-</span> <span class="na">kind</span><span class="pi">:</span> <span class="s">ServiceAccount</span>
+  <span class="na">name</span><span class="pi">:</span> <span class="s">kubernetes-dashboard</span>
+  <span class="na">namespace</span><span class="pi">:</span> <span class="s">kube-system</span>
+</code></pre></div></div>
+
+<p>To add this account you run: 
+$ kubectl apply -f dashboard-admin.yaml 
+<em>clusterrolebinding.rbac.authorization.k8s.io “kubernetes-dashboard” created</em></p>
+
+<p>Next step is to get some information about this account, this is done with this command: 
+$ kubectl describe serviceaccount kubernetes-dashboard -n kube-system</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Name:                kubernetes-dashboard
+Namespace:           kube-system
+Labels:              k8s-app=kubernetes-dashboard
+Annotations:         kubectl.kubernetes.io/last-applied-configuration={"apiVersion":"v1","kind":"ServiceAccount","metadata":{"annotations":{},"labels":{"k8s-app":"kubernetes-dashboard"},"name":"kubernetes-dashboard","name...
+Image pull secrets:  &lt;none&gt;
+Mountable secrets:   kubernetes-dashboard-token-vrlfx
+Tokens:              kubernetes-dashboard-token-vrlfx
+Events:              &lt;none&gt;
+</code></pre></div></div>
+
+<p>This will print some information about the account, but you are interested in the variable beside: mountable secrets. 
+For my example the secret is named (This will be different from each cluster): kubernetes-dashboard-token-vrlfx</p>
+
+<p>To get the token that will allow you to login to your kubernetes dashboard you issue this command (This is with the variable from last command): 
+$ kubectl describe secret kubernetes-dashboard-token-vrlfx -n kube-system</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Name:         kubernetes-dashboard-token-vrlfx
+Namespace:    kube-system
+Labels:       &lt;none&gt;
+Annotations:  kubernetes.io/service-account.name=kubernetes-dashboard
+              kubernetes.io/service-account.uid=acb9aad9-dc1b-11e8-8943-001a4a102616
+
+Type:  kubernetes.io/service-account-token
+
+Data
+====
+ca.crt:     1094 bytes
+namespace:  11 bytes
+token:      longtoken (mine is 905 chars), this is what you will paste into the "token" field in kubernetes dashboard.
+</code></pre></div></div>
+
+<p>This will output a block of text,and you are interested in the one saying token: followed by alot of random letters and numbers, this whole block will be your dashboard token.</p>

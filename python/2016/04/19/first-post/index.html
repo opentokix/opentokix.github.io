@@ -4,10 +4,10 @@
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>About</title>
+    <title>Blogging as a sysadmin</title>
     <meta name="viewport" content="width=device-width">
     <meta name="description" content="Monitoring and metrics">
-    <link rel="canonical" href="https://random.0x7b8.net/blog/about/">
+    <link rel="canonical" href="https://random.0x7b8.net/blog/python/2016/04/19/first-post/">
 
     <!-- Custom CSS -->
     <link rel="stylesheet" href="/blog/css/main.css">
@@ -58,14 +58,40 @@
       <div class="post">
 
   <header class="post-header">
-    <h1>About</h1>
+    <h1>Blogging as a sysadmin</h1>
+    <p class="meta">Apr 19, 2016</p>
   </header>
 
   <article class="post-content">
-  <p>This is a blog with random tidbits of a systems administrator. Will talk about the way I do things. What I think works, what I think does not work.</p>
+  <p>This is the first post, and I was thinking I would note down some stuff I did in python today.
+Trying python3 print function for fun and profit.</p>
 
-<p>I expect zero readers</p>
+<p>To use it in python2:</p>
 
+<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="c">#!/usr/bin/env python2</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">print_function</span>
+<span class="k">print</span><span class="p">(</span><span class="s">"Starting: "</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s">''</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">):</span>
+        <span class="k">print</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s">''</span><span class="p">)</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">"Done!"</span><span class="p">)</span></code></pre></figure>
+
+<p>And it is native in python3</p>
+
+<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="c">#!/usr/bin/env python3</span>
+<span class="k">print</span><span class="p">(</span><span class="s">"Starting: "</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s">''</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">):</span>
+        <span class="k">print</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s">''</span><span class="p">)</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">"Done!"</span><span class="p">)</span></code></pre></figure>
+
+<p>This will print:</p>
+
+<p>Starting: 0123456789Done!</p>
+
+<p>And that is super exciting!</p>
+
+<p>My perfered Linux distribution is</p>
+
+<p><img src="https://random.0x7b8.net/pics/Debian_logo.png" alt="Debian logo" /></p>
 
   </article>
 

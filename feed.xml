@@ -1,68 +1,303 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Sysadmin life</title>
-    <description>This is a blog about tech tips, sysadmin focued
-</description>
-    <link>http://yourdomain.com/</link>
-    <atom:link href="http://yourdomain.com/feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Mon, 18 Apr 2016 15:13:16 +0200</pubDate>
-    <lastBuildDate>Mon, 18 Apr 2016 15:13:16 +0200</lastBuildDate>
-    <generator>Jekyll v2.5.0</generator>
+    <title>Server, Linux, Software, Hardware</title>
+    <description>Monitoring and metrics</description>
+    <link>https://random.0x7b8.net/blog/</link>
+    <atom:link href="https://random.0x7b8.net/blog/feed.xml" rel="self" type="application/rss+xml" />
+    <pubDate>Tue, 06 Nov 2018 08:32:09 +0100</pubDate>
+    <lastBuildDate>Tue, 06 Nov 2018 08:32:09 +0100</lastBuildDate>
+    <generator>Jekyll v3.1.6</generator>
     
       <item>
-        <title>Second post</title>
-        <description>&lt;p&gt;This is a second update to make my autobuild, auto update script to work&lt;/p&gt;
+        <title>Kubernetes Dashboard Auth</title>
+        <description>&lt;h2 id=&quot;kubernetes-dashboard&quot;&gt;Kubernetes dashboard&lt;/h2&gt;
+
+&lt;h3 id=&quot;kubernetes-dashboard-authorization&quot;&gt;Kubernetes Dashboard Authorization&lt;/h3&gt;
+
+&lt;p&gt;To access the kubernetes dashboard you login to your controller or use your own client where you have a &lt;em&gt;kubectl&lt;/em&gt; working.&lt;/p&gt;
+
+&lt;h4 id=&quot;kubectl&quot;&gt;Kubectl&lt;/h4&gt;
+
+&lt;p&gt;Enable proxy, local client: 
+$ kubectl proxy&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;ssh-tunnel proxy:&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;ssh -L 8001:localhost:8001 host-with-kubectl
+$ kubectl proxy&lt;/p&gt;
+
+&lt;p&gt;What proxy is doing is that it opens up a localhost proxy to various functions in your kubernetesystem via webinterface and you will be authorized to do stuff.&lt;/p&gt;
+
+&lt;h4 id=&quot;kubernetes-dashboard-1&quot;&gt;Kubernetes dashboard&lt;/h4&gt;
+
+&lt;p&gt;Since a few versions back you are not allowed to access the dashboard without authorization and there is a few steps needed to get the token.&lt;/p&gt;
+
+&lt;p&gt;This will create a ServiceAccount with admin access (This is not recommended for production) name this file: dashboard-admin.yaml&lt;/p&gt;
+
+&lt;div class=&quot;language-yaml highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;na&quot;&gt;apiVersion&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;rbac.authorization.k8s.io/v1beta1&lt;/span&gt;
+&lt;span class=&quot;na&quot;&gt;kind&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;ClusterRoleBinding&lt;/span&gt;
+&lt;span class=&quot;na&quot;&gt;metadata&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+  &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;kubernetes-dashboard&lt;/span&gt;
+  &lt;span class=&quot;na&quot;&gt;labels&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+    &lt;span class=&quot;na&quot;&gt;k8s-app&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;kubernetes-dashboard&lt;/span&gt;
+&lt;span class=&quot;na&quot;&gt;roleRef&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+  &lt;span class=&quot;na&quot;&gt;apiGroup&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;rbac.authorization.k8s.io&lt;/span&gt;
+  &lt;span class=&quot;na&quot;&gt;kind&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;ClusterRole&lt;/span&gt;
+  &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;cluster-admin&lt;/span&gt;
+&lt;span class=&quot;na&quot;&gt;subjects&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+&lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;kind&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;ServiceAccount&lt;/span&gt;
+  &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;kubernetes-dashboard&lt;/span&gt;
+  &lt;span class=&quot;na&quot;&gt;namespace&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;kube-system&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;To add this account you run: 
+$ kubectl apply -f dashboard-admin.yaml 
+&lt;em&gt;clusterrolebinding.rbac.authorization.k8s.io “kubernetes-dashboard” created&lt;/em&gt;&lt;/p&gt;
+
+&lt;p&gt;Next step is to get some information about this account, this is done with this command: 
+$ kubectl describe serviceaccount kubernetes-dashboard -n kube-system&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;Name:                kubernetes-dashboard
+Namespace:           kube-system
+Labels:              k8s-app=kubernetes-dashboard
+Annotations:         kubectl.kubernetes.io/last-applied-configuration={&quot;apiVersion&quot;:&quot;v1&quot;,&quot;kind&quot;:&quot;ServiceAccount&quot;,&quot;metadata&quot;:{&quot;annotations&quot;:{},&quot;labels&quot;:{&quot;k8s-app&quot;:&quot;kubernetes-dashboard&quot;},&quot;name&quot;:&quot;kubernetes-dashboard&quot;,&quot;name...
+Image pull secrets:  &amp;lt;none&amp;gt;
+Mountable secrets:   kubernetes-dashboard-token-vrlfx
+Tokens:              kubernetes-dashboard-token-vrlfx
+Events:              &amp;lt;none&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;This will print some information about the account, but you are interested in the variable beside: mountable secrets. 
+For my example the secret is named (This will be different from each cluster): kubernetes-dashboard-token-vrlfx&lt;/p&gt;
+
+&lt;p&gt;To get the token that will allow you to login to your kubernetes dashboard you issue this command (This is with the variable from last command): 
+$ kubectl describe secret kubernetes-dashboard-token-vrlfx -n kube-system&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;Name:         kubernetes-dashboard-token-vrlfx
+Namespace:    kube-system
+Labels:       &amp;lt;none&amp;gt;
+Annotations:  kubernetes.io/service-account.name=kubernetes-dashboard
+              kubernetes.io/service-account.uid=acb9aad9-dc1b-11e8-8943-001a4a102616
+
+Type:  kubernetes.io/service-account-token
+
+Data
+====
+ca.crt:     1094 bytes
+namespace:  11 bytes
+token:      longtoken (mine is 905 chars), this is what you will paste into the &quot;token&quot; field in kubernetes dashboard.
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;This will output a block of text,and you are interested in the one saying token: followed by alot of random letters and numbers, this whole block will be your dashboard token.&lt;/p&gt;
 </description>
-        <pubDate>Mon, 18 Apr 2016 17:01:30 +0200</pubDate>
-        <link>http://yourdomain.com/page/2016/04/18/second-post.html</link>
-        <guid isPermaLink="true">http://yourdomain.com/page/2016/04/18/second-post.html</guid>
+        <pubDate>Sat, 06 Oct 2018 00:00:00 +0200</pubDate>
+        <link>https://random.0x7b8.net/blog/2018/10/06/kubernetes-dashboard-auth/</link>
+        <guid isPermaLink="true">https://random.0x7b8.net/blog/2018/10/06/kubernetes-dashboard-auth/</guid>
         
-        
-        <category>page</category>
         
       </item>
     
       <item>
-        <title>First post</title>
-        <description>&lt;p&gt;This is the first and incredible boring post in this blog&lt;/p&gt;
+        <title>Ubuntu 16.04 LTS Workstation upgrade</title>
+        <description>&lt;p&gt;Usually I don’t jump on the bandwagon, but I can change my mind and today I wanted to be on the bleeding edge of the ubuntu wagon. Went on and upgraded my ubuntu 14.04 LTS to 16.04 LTS and the upgrade was not flawless like I have come to expect from debian.&lt;/p&gt;
+
+&lt;p&gt;For some reason the normal do-release-upgrade did not pick up a new release, so I hade to use the command &lt;code class=&quot;highlighter-rouge&quot;&gt;do-release-upgrade -d&lt;/code&gt; to get the beta.&lt;/p&gt;
+
+&lt;h3 id=&quot;mount-by-uuid&quot;&gt;Mount by UUID&lt;/h3&gt;
+
+&lt;p&gt;My partition layout for all machines (workstation and servers) is always the same.&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-text&quot; data-lang=&quot;text&quot;&gt;/dev/sda1 /boot 
+/dev/mapper/vg0-sysroot /
+/dev/mapper/vg0-sysuser /usr
+/dev/mapper/vg0-syshome /home
+/dev/mapper/vg0-sysvar  /var
+/dev/mapper/vg0-swap    swap &lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;And then my fstab usually look something like this.&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-text&quot; data-lang=&quot;text&quot;&gt;UUID=&quot;da877b81-58f9-493a-b152-d5a61e0210c6&quot; / ext4 defaults 0 1
+UUID=&quot;b055a78d-2642-4835-9dbc-6828872b93d9&quot; /usr ext4 default 0 2&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;When I booted my fresh 16.04 for some reason /usr was impossible to mount by UUID, all else / /home etc, works perfectly. But not /usr.&lt;/p&gt;
+
+&lt;p&gt;Solution:&lt;/p&gt;
+
+&lt;p&gt;In initramfs I mounted /usr under /root/usr to get access to an editor, then remounted /root rw from ro to be able to edit my fstab. Commands below.&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-text&quot; data-lang=&quot;text&quot;&gt;lvm vgchange -ay 
+mount -o rw,remount /root
+mount /dev/mapper/vg0-sysusr /root/usr
+/root/usr/bin/vim.tiny /root/fstab &lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;Then I replaced the UUID=… entry with /dev/mapper/vg0-sysusr&lt;/p&gt;
+
+&lt;h1 id=&quot;video-driver-in-xorg&quot;&gt;Video driver in Xorg&lt;/h1&gt;
+
+&lt;p&gt;My next hurdle that was a big one, was to transition from fglrx to amdgpu that is the new standard in ubuntu 16.04. fglrx does not even support the xorg 1.8 ABI that is default now.&lt;/p&gt;
+
+&lt;p&gt;This took a long long time, and lots of googling and to end up in the wrong solution path.&lt;/p&gt;
+
+&lt;p&gt;What I ended up doing was.&lt;/p&gt;
+
+&lt;h3 id=&quot;disable-high-res-console-for-grub-and-boot-so-it-never-leaves-textmode&quot;&gt;Disable high res console for grub and boot, so it never leaves textmode.&lt;/h3&gt;
+
+&lt;p&gt;This is something I personally prefer since those consoles tend to be much faster, and monitors find the correct mode quicker and such.&lt;/p&gt;
+
+&lt;p&gt;This is done by adding this to your /etc/default/grub and issuing update-grub2 
+This is added with the other options on &lt;code class=&quot;highlighter-rouge&quot;&gt;GRUB_CMDLINE_LINUX_DEFAULT&lt;/code&gt;&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-text&quot; data-lang=&quot;text&quot;&gt;nofb vga=normal video=vesafb:off&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;h3 id=&quot;nomodeset&quot;&gt;nomodeset&lt;/h3&gt;
+
+&lt;p&gt;For a long time nomodeset has been default on the grub cmdline, I am not sure why. But setting nomodeset or nomodeset=1 or radeon.nomodeset=1 will make your amdgpu unable to load.&lt;/p&gt;
+
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;*ERROR* vgacon disables radeon kernel modesetting&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;This will show up in your dmesg/kernel log&lt;/p&gt;
+
+&lt;p&gt;So my entire grub cmd line ended up like this: 
+&lt;code class=&quot;highlighter-rouge&quot;&gt;GRUB_CMDLINE_LINUX_DEFAULT=&quot;quiet splash nofb vga=normal video=vesafb:off&quot;&lt;/code&gt;&lt;/p&gt;
+
+&lt;h1 id=&quot;screen-configuration-in-x&quot;&gt;Screen configuration in X&lt;/h1&gt;
+
+&lt;p&gt;My workstation has three screens, two are in portrait mode and one in landscape mode.&lt;/p&gt;
+
+&lt;p&gt;Quick and dirty solution is making a xrandr script that will rotate my screens, and position them correctly for me.&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;&lt;span class=&quot;c&quot;&gt;#/bin/bash&lt;/span&gt;
+
+xrandr &lt;span class=&quot;nt&quot;&gt;--output&lt;/span&gt; HDMI-2 &lt;span class=&quot;nt&quot;&gt;--rotate&lt;/span&gt; left
+xrandr &lt;span class=&quot;nt&quot;&gt;--output&lt;/span&gt; DVI-0 &lt;span class=&quot;nt&quot;&gt;--rotate&lt;/span&gt; left
+xrandr &lt;span class=&quot;nt&quot;&gt;--output&lt;/span&gt; DVI-0 &lt;span class=&quot;nt&quot;&gt;--right-of&lt;/span&gt; HDMI-2
+xrandr &lt;span class=&quot;nt&quot;&gt;--output&lt;/span&gt; DVI-1 &lt;span class=&quot;nt&quot;&gt;--right-of&lt;/span&gt; DVI-0
+xrandr &lt;span class=&quot;nt&quot;&gt;--output&lt;/span&gt; DVI-1 &lt;span class=&quot;nt&quot;&gt;--pos&lt;/span&gt; +2160x770&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;h3 id=&quot;hardware&quot;&gt;Hardware&lt;/h3&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;i5-4670K CPU @ 3.40GHz&lt;/li&gt;
+  &lt;li&gt;16G Ram&lt;/li&gt;
+  &lt;li&gt;SSD&lt;/li&gt;
+  &lt;li&gt;Radeon R7 370&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3 id=&quot;conclusion&quot;&gt;Conclusion&lt;/h3&gt;
+
+&lt;p&gt;It was not super easy to figure out the nomodeset. But I am super happy with my upgrade. And my desktop feels very very fast now. Scrolling massive webpages is fluent, opening new tabs. Using libreoffice felt very responsive and fast. I am actually suprised by this desktop experience.&lt;/p&gt;
+
+&lt;p&gt;My window manager of choice is i3 wm, when I found it I will never go to anything else I think. It is wonderful.&lt;/p&gt;
+
 </description>
-        <pubDate>Mon, 18 Apr 2016 16:58:30 +0200</pubDate>
-        <link>http://yourdomain.com/initial/update/2016/04/18/first-post.html</link>
-        <guid isPermaLink="true">http://yourdomain.com/initial/update/2016/04/18/first-post.html</guid>
+        <pubDate>Fri, 22 Apr 2016 00:00:00 +0200</pubDate>
+        <link>https://random.0x7b8.net/blog/2016/04/22/ubuntu-16-04-workstation-upgrade/</link>
+        <guid isPermaLink="true">https://random.0x7b8.net/blog/2016/04/22/ubuntu-16-04-workstation-upgrade/</guid>
         
+        <category>sysadmin,</category>
         
-        <category>initial</category>
+        <category>ubuntu,</category>
         
-        <category>update</category>
+        <category>16.04,</category>
+        
+        <category>lts,</category>
+        
+        <category>upgrade,</category>
+        
+        <category>radeon,</category>
+        
+        <category>video,</category>
+        
+        <category>driver,</category>
+        
+        <category>xorg</category>
+        
         
       </item>
     
       <item>
-        <title>Welcome to Jekyll!</title>
-        <description>&lt;p&gt;You’ll find this post in your &lt;code&gt;_posts&lt;/code&gt; directory. Go ahead and edit it and re-build the site to see your changes. You can rebuild the site in many different ways, but the most common way is to run &lt;code&gt;jekyll serve&lt;/code&gt;, which launches a web server and auto-regenerates your site when a file is updated.&lt;/p&gt;
+        <title>Life as a sysadmin</title>
+        <description>&lt;h1 id=&quot;sysadmin-life-style&quot;&gt;Sysadmin life style&lt;/h1&gt;
 
-&lt;p&gt;To add new posts, simply add a file in the &lt;code&gt;_posts&lt;/code&gt; directory that follows the convention &lt;code&gt;YYYY-MM-DD-name-of-post.ext&lt;/code&gt; and includes the necessary front matter. Take a look at the source for this post to get an idea about how it works.&lt;/p&gt;
+&lt;h3 id=&quot;start-using-computers&quot;&gt;Start using computers&lt;/h3&gt;
 
-&lt;p&gt;Jekyll also offers powerful support for code snippets:&lt;/p&gt;
+&lt;p&gt;When I was 13 years old I had my first real encounter with unsupervised computer usage. It was incredible, I had no idea what I was doing and it was the best time of life so far. Everyday since then I have had the same feeling, everyday at work and everyday at home. The feeling of full control, and endless possibilites.&lt;/p&gt;
 
-&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-ruby&quot; data-lang=&quot;ruby&quot;&gt;&lt;span class=&quot;k&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;print_hi&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-  &lt;span class=&quot;nb&quot;&gt;puts&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&amp;quot;Hi, &lt;/span&gt;&lt;span class=&quot;si&quot;&gt;#{&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;si&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&amp;quot;&lt;/span&gt;
-&lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;print_hi&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;&amp;#39;Tom&amp;#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-&lt;span class=&quot;c1&quot;&gt;#=&amp;gt; prints &amp;#39;Hi, Tom&amp;#39; to STDOUT.&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;h3 id=&quot;knowledge&quot;&gt;Knowledge&lt;/h3&gt;
 
-&lt;p&gt;Check out the &lt;a href=&quot;http://jekyllrb.com&quot;&gt;Jekyll docs&lt;/a&gt; for more info on how to get the most out of Jekyll. File all bugs/feature requests at &lt;a href=&quot;https://github.com/jekyll/jekyll&quot;&gt;Jekyll’s GitHub repo&lt;/a&gt;. If you have questions, you can ask them on &lt;a href=&quot;https://github.com/jekyll/jekyll-help&quot;&gt;Jekyll’s dedicated Help repository&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;Information around computers and computer usage has always come very easy to me. Since is the number one thing I really enjoy doing even now 26 years later. I read anything I can get my hands on, listen to podcasts related to my field, or about things I hate. I want to know, I want to grasp something about everything. Knowledge is power! And you need power to be root.&lt;/p&gt;
+
+&lt;h3 id=&quot;technology&quot;&gt;Technology&lt;/h3&gt;
+
+&lt;p&gt;The most important aspects of beeing a great sysadmin is to keep current. Maybe not use everything, but to keep an eye of what is happening in your field. Sometimes it will change your mind on a tech, and sometimes (most of the time) it will give you the information you need to say no!&lt;/p&gt;
+
+&lt;h3 id=&quot;monitoring-and-metrics&quot;&gt;Monitoring and metrics&lt;/h3&gt;
+
+&lt;p&gt;I obsess over my monitoring, I want to know why every single error and warning occurs. I want to know if it is needed, is this treshold the correct one, should I make it tighter or looser. I want my monitoring to be perfect.&lt;/p&gt;
+
+&lt;p&gt;When it comes to metrics, they are great for troubleshooting, but what is even more important is to keep track on what your systems look like when they are running normal. If you dont know what is normal, you have no way of knowing what your troubleshooting should lead to and where to start.&lt;/p&gt;
+
+&lt;h3 id=&quot;can-everybody-become-a-sysadmin&quot;&gt;Can everybody become a sysadmin&lt;/h3&gt;
+
+&lt;p&gt;I do not think so. Every good and great sysadmin I have ever meet seem to be a certain obsessive type of person. Very detail oriented, and tend to be quite excentric. This is of course only my personal observations.&lt;/p&gt;
 
 </description>
-        <pubDate>Mon, 18 Apr 2016 16:51:52 +0200</pubDate>
-        <link>http://yourdomain.com/jekyll/update/2016/04/18/welcome-to-jekyll.html</link>
-        <guid isPermaLink="true">http://yourdomain.com/jekyll/update/2016/04/18/welcome-to-jekyll.html</guid>
+        <pubDate>Fri, 22 Apr 2016 00:00:00 +0200</pubDate>
+        <link>https://random.0x7b8.net/blog/2016/04/22/life-of-a-sysadmin/</link>
+        <guid isPermaLink="true">https://random.0x7b8.net/blog/2016/04/22/life-of-a-sysadmin/</guid>
         
         
-        <category>jekyll</category>
+      </item>
+    
+      <item>
+        <title>Blogging as a sysadmin</title>
+        <description>&lt;p&gt;This is the first post, and I was thinking I would note down some stuff I did in python today.
+Trying python3 print function for fun and profit.&lt;/p&gt;
+
+&lt;p&gt;To use it in python2:&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-python&quot; data-lang=&quot;python&quot;&gt;&lt;span class=&quot;c&quot;&gt;#!/usr/bin/env python2&lt;/span&gt;
+&lt;span class=&quot;kn&quot;&gt;from&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;__future__&lt;/span&gt; &lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;print_function&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;print&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;Starting: &quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;end&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&#39;&#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;i&lt;/span&gt; &lt;span class=&quot;ow&quot;&gt;in&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;range&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;10&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;):&lt;/span&gt;
+        &lt;span class=&quot;k&quot;&gt;print&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;end&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&#39;&#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+            &lt;span class=&quot;k&quot;&gt;print&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;Done!&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;And it is native in python3&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-python&quot; data-lang=&quot;python&quot;&gt;&lt;span class=&quot;c&quot;&gt;#!/usr/bin/env python3&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;print&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;Starting: &quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;end&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&#39;&#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;i&lt;/span&gt; &lt;span class=&quot;ow&quot;&gt;in&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;range&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;10&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;):&lt;/span&gt;
+        &lt;span class=&quot;k&quot;&gt;print&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;end&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&#39;&#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+            &lt;span class=&quot;k&quot;&gt;print&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;Done!&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;This will print:&lt;/p&gt;
+
+&lt;p&gt;Starting: 0123456789Done!&lt;/p&gt;
+
+&lt;p&gt;And that is super exciting!&lt;/p&gt;
+
+&lt;p&gt;My perfered Linux distribution is&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;https://random.0x7b8.net/pics/Debian_logo.png&quot; alt=&quot;Debian logo&quot; /&gt;&lt;/p&gt;
+</description>
+        <pubDate>Tue, 19 Apr 2016 00:00:00 +0200</pubDate>
+        <link>https://random.0x7b8.net/blog/python/2016/04/19/first-post/</link>
+        <guid isPermaLink="true">https://random.0x7b8.net/blog/python/2016/04/19/first-post/</guid>
         
-        <category>update</category>
+        <category>blog,</category>
+        
+        <category>sysadmin,</category>
+        
+        <category>linux,</category>
+        
+        <category>debian,</category>
+        
+        <category>ubuntu</category>
+        
+        
+        <category>python</category>
         
       </item>
     

@@ -4,10 +4,10 @@
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>About</title>
+    <title>Ubuntu 16.04 LTS Workstation upgrade</title>
     <meta name="viewport" content="width=device-width">
     <meta name="description" content="Monitoring and metrics">
-    <link rel="canonical" href="https://random.0x7b8.net/blog/about/">
+    <link rel="canonical" href="https://random.0x7b8.net/blog/2016/04/22/ubuntu-16-04-workstation-upgrade/">
 
     <!-- Custom CSS -->
     <link rel="stylesheet" href="/blog/css/main.css">
@@ -58,13 +58,100 @@
       <div class="post">
 
   <header class="post-header">
-    <h1>About</h1>
+    <h1>Ubuntu 16.04 LTS Workstation upgrade</h1>
+    <p class="meta">Apr 22, 2016</p>
   </header>
 
   <article class="post-content">
-  <p>This is a blog with random tidbits of a systems administrator. Will talk about the way I do things. What I think works, what I think does not work.</p>
+  <p>Usually I don’t jump on the bandwagon, but I can change my mind and today I wanted to be on the bleeding edge of the ubuntu wagon. Went on and upgraded my ubuntu 14.04 LTS to 16.04 LTS and the upgrade was not flawless like I have come to expect from debian.</p>
 
-<p>I expect zero readers</p>
+<p>For some reason the normal do-release-upgrade did not pick up a new release, so I hade to use the command <code class="highlighter-rouge">do-release-upgrade -d</code> to get the beta.</p>
+
+<h3 id="mount-by-uuid">Mount by UUID</h3>
+
+<p>My partition layout for all machines (workstation and servers) is always the same.</p>
+
+<figure class="highlight"><pre><code class="language-text" data-lang="text">/dev/sda1 /boot 
+/dev/mapper/vg0-sysroot /
+/dev/mapper/vg0-sysuser /usr
+/dev/mapper/vg0-syshome /home
+/dev/mapper/vg0-sysvar  /var
+/dev/mapper/vg0-swap    swap </code></pre></figure>
+
+<p>And then my fstab usually look something like this.</p>
+
+<figure class="highlight"><pre><code class="language-text" data-lang="text">UUID="da877b81-58f9-493a-b152-d5a61e0210c6" / ext4 defaults 0 1
+UUID="b055a78d-2642-4835-9dbc-6828872b93d9" /usr ext4 default 0 2</code></pre></figure>
+
+<p>When I booted my fresh 16.04 for some reason /usr was impossible to mount by UUID, all else / /home etc, works perfectly. But not /usr.</p>
+
+<p>Solution:</p>
+
+<p>In initramfs I mounted /usr under /root/usr to get access to an editor, then remounted /root rw from ro to be able to edit my fstab. Commands below.</p>
+
+<figure class="highlight"><pre><code class="language-text" data-lang="text">lvm vgchange -ay 
+mount -o rw,remount /root
+mount /dev/mapper/vg0-sysusr /root/usr
+/root/usr/bin/vim.tiny /root/fstab </code></pre></figure>
+
+<p>Then I replaced the UUID=… entry with /dev/mapper/vg0-sysusr</p>
+
+<h1 id="video-driver-in-xorg">Video driver in Xorg</h1>
+
+<p>My next hurdle that was a big one, was to transition from fglrx to amdgpu that is the new standard in ubuntu 16.04. fglrx does not even support the xorg 1.8 ABI that is default now.</p>
+
+<p>This took a long long time, and lots of googling and to end up in the wrong solution path.</p>
+
+<p>What I ended up doing was.</p>
+
+<h3 id="disable-high-res-console-for-grub-and-boot-so-it-never-leaves-textmode">Disable high res console for grub and boot, so it never leaves textmode.</h3>
+
+<p>This is something I personally prefer since those consoles tend to be much faster, and monitors find the correct mode quicker and such.</p>
+
+<p>This is done by adding this to your /etc/default/grub and issuing update-grub2 
+This is added with the other options on <code class="highlighter-rouge">GRUB_CMDLINE_LINUX_DEFAULT</code></p>
+
+<figure class="highlight"><pre><code class="language-text" data-lang="text">nofb vga=normal video=vesafb:off</code></pre></figure>
+
+<h3 id="nomodeset">nomodeset</h3>
+
+<p>For a long time nomodeset has been default on the grub cmdline, I am not sure why. But setting nomodeset or nomodeset=1 or radeon.nomodeset=1 will make your amdgpu unable to load.</p>
+
+<p><code class="highlighter-rouge">*ERROR* vgacon disables radeon kernel modesetting</code></p>
+
+<p>This will show up in your dmesg/kernel log</p>
+
+<p>So my entire grub cmd line ended up like this: 
+<code class="highlighter-rouge">GRUB_CMDLINE_LINUX_DEFAULT="quiet splash nofb vga=normal video=vesafb:off"</code></p>
+
+<h1 id="screen-configuration-in-x">Screen configuration in X</h1>
+
+<p>My workstation has three screens, two are in portrait mode and one in landscape mode.</p>
+
+<p>Quick and dirty solution is making a xrandr script that will rotate my screens, and position them correctly for me.</p>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="c">#/bin/bash</span>
+
+xrandr <span class="nt">--output</span> HDMI-2 <span class="nt">--rotate</span> left
+xrandr <span class="nt">--output</span> DVI-0 <span class="nt">--rotate</span> left
+xrandr <span class="nt">--output</span> DVI-0 <span class="nt">--right-of</span> HDMI-2
+xrandr <span class="nt">--output</span> DVI-1 <span class="nt">--right-of</span> DVI-0
+xrandr <span class="nt">--output</span> DVI-1 <span class="nt">--pos</span> +2160x770</code></pre></figure>
+
+<h3 id="hardware">Hardware</h3>
+
+<ul>
+  <li>i5-4670K CPU @ 3.40GHz</li>
+  <li>16G Ram</li>
+  <li>SSD</li>
+  <li>Radeon R7 370</li>
+</ul>
+
+<h3 id="conclusion">Conclusion</h3>
+
+<p>It was not super easy to figure out the nomodeset. But I am super happy with my upgrade. And my desktop feels very very fast now. Scrolling massive webpages is fluent, opening new tabs. Using libreoffice felt very responsive and fast. I am actually suprised by this desktop experience.</p>
+
+<p>My window manager of choice is i3 wm, when I found it I will never go to anything else I think. It is wonderful.</p>
 
 
   </article>
