@@ -3,7 +3,7 @@ name: mkdocs pages deploy # (1)!
 on:
   push:
     branches:
-      - master
+      - main
 permissions:
   contents: write
 jobs:
