@@ -1,19 +1,57 @@
-# Welcome to MkDocs
+# Opentokix
 
-For full documentation visit [mkdocs.org](https://www.mkdocs.org).
+This site a collection of tools, snippets and resources for developers, platform engineers, SREs, DevOps and related fields.
 
-tba tba tba 
+## Tools
 
-## Commands
+Tools you might find yourself using after reading this documentation is, but not limited to.
 
-* `mkdocs new [dir-name]` - Create a new project.
-* `mkdocs serve` - Start the live-reloading docs server.
-* `mkdocs build` - Build the documentation site.
-* `mkdocs -h` - Print help message and exit.
 
-## Project layout
+### CLI tools
+  * kubectl
+  * helm
+  * flux
+  * terraform
+  * ansible
+  * krane/crane
+  * zsh
+  * brew
+  * git
+  * mermaid
 
-    mkdocs.yml    # The configuration file.
-    docs/
-        index.md  # The documentation homepage.
-        ...       # Other markdown pages, images and other files.
+### Applications
+  * gitlab
+  * github
+  * vscode
+  * podman
+  * wireguard
+  * netbox
+  * mattermost
+  * slack
+  * elastic-stack
+  * grafana
+  * prometheus
+  * alertmanager
+  * ZeroSSL/LetsEncrypt
+  * certbot
+
+### Systems
+  * kubernetes
+  * flux
+  * argocd
+  * netbox
+  * public clouds
+    * AWS
+    * GCP
+  * private clouds
+    * Openstack
+    * Proxmox
+
+### Desktop
+  * Gimp
+  * Blender
+  * Fusion360
+  * Davinci Resolve
+  * OBS Studio
+
+
