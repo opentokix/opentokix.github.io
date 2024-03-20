@@ -1,1 +1,54 @@
-site_name: My Docs
+site_name: Hypercube Handbook
+theme:
+  name: material
+  font:
+    text: Fira Sans
+    code: Fira Code
+  palette:
+    - scheme: default
+      primary: dark-orange
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    # Palette toggle for dark mode
+    - scheme: slate
+      primary: blue-grey
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+  favicon: favicon/handbook.ico
+  logo: assets/hypercube.png
+  features:
+    - navigation.top
+    - navigation.path
+    - content.code.copy
+    - content.code.annotate
+markdown_extensions:
+  - admonition
+  - pymdownx.highlight:
+      linenums: true
+      anchor_linenums: true
+      linenums_style: pymdownx-inline
+  - pymdownx.inlinehilite
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+
+  - pymdownx.snippets
+  - pymdownx.details
+  - pymdownx.critic:
+      mode: view
+  - md_in_html
+  - attr_list
+  - tables
+  - pymdownx.tabbed:
+      alternate_style: true
+extra:
+  generator: false
+extra_javascript:
+  - "js/es-module-shims.js"
+plugins:
+  - git-revision-date
+  - search
