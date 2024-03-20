@@ -32,4 +32,10 @@ Here is an example of how to test the inventory files, this will ping all host t
 ansible -i inventory.yml tags_ssh -m ping
 ```
 
+### Verbose inventory
 
+To see all the groups that are created from tags, clusters etc. You can run the following command.
+
+```bash
+ansible-inventory -i inventory.yml --list
+```
