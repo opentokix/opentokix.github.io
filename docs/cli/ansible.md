@@ -2,6 +2,10 @@
 
 ## Netbox Inventory
 
+Install from ansible-galaxy:
+`ansible-galaxy collection install netbox.netbox`
+
+
 ```yaml title="inventory.yml"
 plugin: netbox.netbox.nb_inventory
 api_endpoint: https://netbox.domain.tld
