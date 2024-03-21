@@ -50,5 +50,4 @@ extra:
 extra_javascript:
   - "js/es-module-shims.js"
 plugins:
-  - git-revision-date
   - search
