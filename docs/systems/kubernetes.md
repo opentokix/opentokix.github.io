@@ -54,7 +54,7 @@ Here you can see all the yaml files that are needed to deploy the above setup.
         spec:
           containers:
             - name: handbook
-              image: 362898812976.dkr.ecr.eu-west-1.amazonaws.com/handbook:1681287728 # {"$imagepolicy": "handbook:handbook-imagepolicy"}
+              image: registry.domain.tld/handbook:tag
               ports:
                 - containerPort: 80
               env:
@@ -106,7 +106,7 @@ Here you can see all the yaml files that are needed to deploy the above setup.
       namespace: handbook
       annotations:
         cert-manager.io/cluster-issuer: zerossl-prod
-        external-dns.alpha.kubernetes.io/hostname: handbook.aws.agilemail.online
+        external-dns.alpha.kubernetes.io/hostname: handbook.domain.tld
         ingress.pomerium.io/allowed_domains: |
           - postnord.com
         ingress.pomerium.io/pass_identity_headers: "false"
@@ -114,10 +114,10 @@ Here you can see all the yaml files that are needed to deploy the above setup.
       ingressClassName: pomerium
       tls:
         - hosts:
-            - handbook.aws.agilemail.online
+            - handbook.domain.tld
           secretName: handbook-tls
       rules:
-      - host: handbook.aws.agilemail.online
+      - host: handbook.domain.tld
         http:
           paths:
           - path: /
